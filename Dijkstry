@@ -18,23 +18,37 @@ class Graf():
         self.wierzcholki = list(wierzcholki)
         self.krawedzie = list(krawedzie)
 
-    def initialize(self, G , z):
+    def initialize(self, z):
+        g_pom = {}
+        for elem in self.wierzcholki:
+            g_pom[elem] = float('inf')
+        g_pom[z] = 0
+        return g_pom
 
-    def extract(self, Q):
+    #def extract(self, Q):
 
-    def neighbors(self, w):
+    #def neighbors(self, w):
+    def neighbors(self,wierzcholek): # zwraca same wierzcholki
+        sas = {}#sasiedzi
+        sas[wierzcholek] = []
+        for krawedz in self.krawedzie:
+            if(wierzcholek == krawedz[0]):
+                self.sasiedzi.append(krawedz[1])
+            if(wierzcholek == krawedz[1]):
+                self.sasiedzi.append(krawedz[0])
+        print(self.sasiedzi) #return self.sasiedzi
 
-    def relax(self, ):
+    #def relax(self, ):
 
 
     
 
 
 if __name__ == "__main__":
-    g_wierzcholki = ["A", "B", "C", "D", "E", "F", "G", "H" , "I" ]
-    g_krawedzie =[ (("A","B"),4),(("C","F"),4),(("I","G"),6),(("H","I"),7),(("C","D"),7),(("A","H"),8),(("B","C"),8),(("D","E"),9), (("H","G"), 1), (("G","F"),2), (("I","C"),2), (("E","F"),10),(("B","H"),11),(("D","F"),14) ]
+    g_wierzcholki = ['S', 'X', 'U', 'Y', 'V']
+    g_krawedzie =[ (('S','U'),10),(('S','X'),5),(('X','V'),9),(('X', 'Y'),2),(('X', 'U'),3),(('U', 'V'),1),(('U', 'X'),2),(('Y', 'V'),6), (('V', 'Y'), 4)]
 
     g = Graf(g_wierzcholki, g_krawedzie)
-    print(g.Kruskal(g_krawedzie))
+    print(g.initialize('S'))
 
     
