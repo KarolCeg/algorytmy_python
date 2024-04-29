@@ -18,37 +18,59 @@ class Graf():
         self.wierzcholki = list(wierzcholki)
         self.krawedzie = list(krawedzie)
 
-    def initialize(self, z):
+    def initialize(self, zrodlo):
         g_pom = {}
         for elem in self.wierzcholki:
             g_pom[elem] = float('inf')
-        g_pom[z] = 0
+        g_pom[zrodlo] = 0
         return g_pom
 
-    #def extract(self, Q):
+    def extract(self,graf, Q):
+        min_val = float('inf')
+        wierzch = -1
+        for wierzcholek in graf:
+            if wierzcholek in Q:
+                if graf[wierzcholek] < min_val:
+                    min_val = graf[wierzcholek]
+                    wierzch = wierzcholek
+        return wierzch # wierzcholek z najmniejszą wartoscia
+                 
 
-    #def neighbors(self, w):
-    def neighbors(self,wierzcholek): # zwraca same wierzcholki
-        sas = {}#sasiedzi
-        sas[wierzcholek] = []
+    def neighbors(self, wierzcholek): # zwraca same wierzcholki
+        sasiedzi = {}#sasiedzi
+        sasiedzi[wierzcholek] = []
         for krawedz in self.krawedzie:
-            if(wierzcholek == krawedz[0]):
-                self.sasiedzi.append(krawedz[1])
-            if(wierzcholek == krawedz[1]):
-                self.sasiedzi.append(krawedz[0])
-        print(self.sasiedzi) #return self.sasiedzi
+            if(wierzcholek == krawedz[0][0]):
+                sasiedzi[wierzcholek].append((krawedz[0][1],krawedz[1]))     
+        return sasiedzi 
 
-    #def relax(self, ):
+    def relax(self,u,v,wartosc,graf):
+        if graf[v] > graf[u] + wartosc:
+            graf[v] = graf[u] + wartosc
+        return graf
 
+    def dijkstra(self, zrodlo):
+        graf = self.initialize(zrodlo)
+        S = []
+        Q = self.wierzcholki
+        T = {}
 
-    
-
+        while Q != []:
+            U = {v: graf[v] for v in self.wierzcholki}
+            u = self.extract(U,Q)
+            T = self.neighbors(u)
+            S.append(u)
+            Q.remove(u)
+            for v,wartosc in T[u]:
+                graf = self.relax(u,v,wartosc,graf)
+                
+        return graf
 
 if __name__ == "__main__":
     g_wierzcholki = ['S', 'X', 'U', 'Y', 'V']
     g_krawedzie =[ (('S','U'),10),(('S','X'),5),(('X','V'),9),(('X', 'Y'),2),(('X', 'U'),3),(('U', 'V'),1),(('U', 'X'),2),(('Y', 'V'),6), (('V', 'Y'), 4)]
 
     g = Graf(g_wierzcholki, g_krawedzie)
-    print(g.initialize('S'))
+    print(g.dijkstra('S'))
 
     
