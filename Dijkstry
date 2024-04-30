@@ -53,15 +53,15 @@ class Graf():
         graf = self.initialize(zrodlo)
         S = []
         Q = self.wierzcholki
-        T = {}
+        sasiedzi_tymcz = {}
 
         while Q != []:
-            U = {v: graf[v] for v in self.wierzcholki}
-            u = self.extract(U,Q)
-            T = self.neighbors(u)
+            pom = {v: graf[v] for v in self.wierzcholki}
+            u = self.extract(pom,Q)
+            sasiedzi_tymcz = self.neighbors(u)
             S.append(u)
             Q.remove(u)
-            for v,wartosc in T[u]:
+            for v,wartosc in sasiedzi_tymcz[u]:
                 graf = self.relax(u,v,wartosc,graf)
                 
         return graf
