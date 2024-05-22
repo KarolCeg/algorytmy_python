@@ -1,7 +1,72 @@
+class Graf:
+    def __init__(self, wierzchołki, krawędzie):
+        for wierzchołek in wierzchołki:
+            if wierzchołki.count(wierzchołek) > 1:
+                raise Exception("nieprawidłowe wierzchołki")
+        for krawędź in krawędzie:
+            if krawędź[0] not in wierzchołki or krawędź[1] not in wierzchołki:
+                raise Exception("nieprawidłowe krawędzie")
+        same_krawędzie = [(u, v) for u, v, _ in krawędzie]
+        for sama_krawędź in same_krawędzie:
+            if same_krawędzie.count(sama_krawędź) > 1:
+                raise Exception("nieprawidłowe krawędzie")
+
+        self.wierzchołki = list(wierzchołki)
+        self.krawędzie = {(u, v): przepustowość for (u, v, przepustowość) in krawędzie}
+        self.inicjalizuj_graf_rezydualny()
+
+    def inicjalizuj_graf_rezydualny(self):
+        self.graf_rezydualny = {(u, v): przepustowość for (u, v), przepustowość in self.krawędzie.items()}
+        for (u, v) in list(self.krawędzie.keys()):
+            if (v, u) not in self.graf_rezydualny:
+                self.graf_rezydualny[(v, u)] = 0
+
+    def bfs(self, źródło, ujście, rodzic):
+        odwiedzone = {w: False for w in self.wierzchołki}
+        kolejka = [źródło]
+        odwiedzone[źródło] = True
+        rodzic[źródło] = None
+
+        while kolejka:
+            u = kolejka.pop(0)
+
+            for v in self.wierzchołki:
+                if not odwiedzone[v] and self.graf_rezydualny.get((u, v), 0) > 0:
+                    kolejka.append(v)
+                    odwiedzone[v] = True
+                    rodzic[v] = u
+
+                    if v == ujście:
+                        return True
+        return False
+
+    def ford_fulkerson(self, źródło, ujście):
+        rodzic = {}
+        maksymalny_przepływ = 0
+
+        while self.bfs(źródło, ujście, rodzic):
+            przepływ_na_ścieżce = float('Inf')
+            s = ujście
+
+            while s != źródło:
+                przepływ_na_ścieżce = min(przepływ_na_ścieżce, self.graf_rezydualny[(rodzic[s], s)])
+                s = rodzic[s]
+
+            v = ujście
+            while v != źródło:
+                u = rodzic[v]
+                self.graf_rezydualny[(u, v)] -= przepływ_na_ścieżce
+                self.graf_rezydualny[(v, u)] += przepływ_na_ścieżce
+                v = rodzic[v]
+
+            maksymalny_przepływ += przepływ_na_ścieżce
+
+        return maksymalny_przepływ
 
 
+# Kod sterujący
 if __name__ == "__main__":
-    g_wierzcholki = ['S', 'V1', 'V2', 'V3', 'V4', 't']
-    g_krawedzie = [('S', 'V1', 16), ('S', 'V2', 13), ('V1', 'V2', 10), ('V2', 'V1', 4), ('V1', 'V3', 12), ('V3', 'V2', 9), ('V2', 'V4', 14), ('V4', 'V3', 7), ('V3', 't', 20), ('V4', 't', 4)]
-
-  
+    g_wierzchołki = ['S', 'V1', 'V2', 'V3', 'V4', 't']
+    g_krawędzie = [('S', 'V1', 16), ('S', 'V2', 13), ('V1', 'V2', 10), ('V2', 'V1', 4), ('V1', 'V3', 12), ('V3', 'V2', 9), ('V2', 'V4', 14), ('V4', 'V3', 7), ('V3', 't', 20), ('V4', 't', 4)]
+    g = Graf(g_wierzchołki, g_krawędzie)
+    print("Maksymalny przepływ wynosi {0}".format(g.ford_fulkerson('S', 't')))
